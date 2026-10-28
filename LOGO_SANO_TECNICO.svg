@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0c1a3a"/>
+      <stop offset=".55" stop-color="#0f1640"/>
+      <stop offset="1" stop-color="#1b1452"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".18" cy=".12" r=".75">
+      <stop offset="0" stop-color="#22d3ee" stop-opacity=".55"/>
+      <stop offset=".6" stop-color="#22d3ee" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glow2" cx=".95" cy="1" r=".6">
+      <stop offset="0" stop-color="#8b5cf6" stop-opacity=".5"/>
+      <stop offset="1" stop-color="#8b5cf6" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="cy" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#67e8f9"/>
+      <stop offset=".5" stop-color="#22d3ee"/>
+      <stop offset="1" stop-color="#3b82f6"/>
+    </linearGradient>
+    <linearGradient id="trace" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#a5f3fc"/>
+    </linearGradient>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#fde047"/>
+      <stop offset=".5" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f97316"/>
+    </linearGradient>
+    <clipPath id="tile"><rect width="512" height="512" rx="120"/></clipPath>
+  </defs>
+  <g clip-path="url(#tile)">
+    <rect width="512" height="512" rx="120" fill="url(#bg)"/>
+    <rect width="512" height="512" fill="url(#glow)"/>
+    <rect width="512" height="512" fill="url(#glow2)"/>
+    <g opacity=".13" stroke="#67e8f9" stroke-width="4" fill="none" stroke-linecap="round">
+      <path d="M40 150h50l24 24M40 220h36M472 300h-40l-22 22M472 360h-30"/>
+      <circle cx="120" cy="178" r="7"/><circle cx="414" cy="326" r="7"/>
+    </g>
+    <!-- Teléfono -->
+    <rect x="148" y="74" width="216" height="364" rx="46" fill="#ffffff" fill-opacity=".05" stroke="url(#cy)" stroke-width="22"/>
+    <rect x="224" y="100" width="64" height="12" rx="6" fill="#22d3ee"/>
+    <!-- Circuito en forma de S -->
+    <path d="M302 166H226q-20 0-20 20v46q0 20 20 20h60q20 0 20 20v46q0 20-20 20H210" fill="none" stroke="url(#trace)" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="302" cy="166" r="17" fill="#0c1a3a" stroke="#22d3ee" stroke-width="9"/>
+    <circle cx="210" cy="338" r="17" fill="#0c1a3a" stroke="#22d3ee" stroke-width="9"/>
+    <!-- Llave de reparación -->
+    <g transform="translate(356 356) rotate(-45)">
+      <g stroke="#0c1a3a" stroke-width="16" stroke-linejoin="round">
+        <path d="M15 -43.5A46 46 0 1 1 -15 -43.5L-15 -12L15 -12Z"/>
+        <rect x="-16" y="28" width="32" height="120" rx="16"/>
+      </g>
+      <path d="M15 -43.5A46 46 0 1 1 -15 -43.5L-15 -12L15 -12Z" fill="url(#amber)"/>
+      <rect x="-16" y="28" width="32" height="120" rx="16" fill="url(#amber)"/>
+      <circle cx="0" cy="118" r="7" fill="#0c1a3a" opacity=".55"/>
+    </g>
+    <!-- Destello -->
+    <path d="M404 92l8 22 22 8-22 8-8 22-8-22-22-8 22-8z" fill="#fde047"/>
+    <path d="M436 158l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#67e8f9"/>
+  </g>
+</svg>

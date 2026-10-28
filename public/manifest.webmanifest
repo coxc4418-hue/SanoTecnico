@@ -1,0 +1,132 @@
+{
+  "id": "/",
+  "name": "Sano-Técnico — Sistema para servicios técnicos",
+  "short_name": "Sano-Técnico",
+  "description": "Órdenes de servicio, presupuestos, abonos, garantías, inventario de repuestos, facturación en $ y Bs, caja, técnicos y reportes para talleres de reparación de celulares y tecnología.",
+  "start_url": "/?source=app",
+  "scope": "/",
+  "display": "standalone",
+  "launch_handler": {
+    "client_mode": "focus-existing"
+  },
+  "orientation": "any",
+  "background_color": "#060a14",
+  "theme_color": "#0b1630",
+  "lang": "es",
+  "dir": "ltr",
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "/assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Recibir equipo",
+      "short_name": "Recibir",
+      "url": "/#/recibir",
+      "icons": [
+        {
+          "src": "/assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Órdenes del taller",
+      "short_name": "Órdenes",
+      "url": "/#/ordenes",
+      "icons": [
+        {
+          "src": "/assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Vender",
+      "short_name": "Vender",
+      "url": "/#/vender",
+      "icons": [
+        {
+          "src": "/assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Inventario",
+      "short_name": "Inventario",
+      "url": "/#/inventario",
+      "icons": [
+        {
+          "src": "/assets/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/screens/pc-inicio.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Resumen del taller y equipos por etapa"
+    },
+    {
+      "src": "/assets/screens/pc-ordenes.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tablero de reparaciones"
+    },
+    {
+      "src": "/assets/screens/pc-recibir.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Recepción del equipo paso a paso"
+    },
+    {
+      "src": "/assets/screens/movil-inicio.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Resumen del taller"
+    },
+    {
+      "src": "/assets/screens/movil-ordenes.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Órdenes desde el teléfono"
+    },
+    {
+      "src": "/assets/screens/movil-estado.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Consulta en línea para el cliente"
+    }
+  ]
+}
