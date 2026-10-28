@@ -7,7 +7,7 @@ import { icon } from './icons.js';
 import { openRateModal, autoUpdateRate, salesWa, SALES_PHONE_FMT } from './shared.js';
 import { isStandalone, platform, bindInstallButtons } from './install.js';
 
-export const VERSION = '1.0.0';
+export const VERSION = '1.0.2';
 
 const ROUTES = {
   inicio: { title: 'Inicio', icon: 'home', group: 'Taller', load: () => import('./views/dashboard.js') },

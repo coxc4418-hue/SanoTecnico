@@ -1,5 +1,5 @@
 // Sano-Técnico — Service Worker (PWA, funcionamiento sin conexión)
-const VERSION = 'sanotecnico-v1.0.0';
+const VERSION = 'sanotecnico-v1.0.2';
 const SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
 const VIEWS = ['dashboard', 'intake', 'repairs', 'warranties', 'pos', 'invoices', 'cash', 'customers', 'inventory', 'techs', 'reports', 'settings', 'admin', 'search', 'tracking'];
 const SHELL = [

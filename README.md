@@ -21,7 +21,7 @@ Sistema para servicios técnicos y talleres de reparación de celulares, tablets
 
 - `public/` — la app (JS modular sin compilación, Firebase SDK 10 por CDN).
 - `firestore.rules` — aislamiento por sede (`tenants/{uid}`), bloqueo de sedes congeladas o vencidas, demos que caducan y fichas públicas `tracking/{código}` (solo lectura por código exacto).
-- `scripts/` — `provision.mjs` (crea admin + sedes y el archivo de credenciales), `e2e.mjs` + `test-emu.sh` (prueba completa en emuladores), `prod-smoke.mjs`, `pwa-check.mjs`, `print-check.mjs`, `screens.mjs`, `icons.mjs`, `tutorial/make-video.mjs`.
+- `scripts/` — `provision.mjs` (crea admin + sedes y el archivo de credenciales), `e2e.mjs` + `test-emu.sh` (prueba completa en emuladores), `prod-smoke.mjs`, `pwa-check.mjs`, `mobile-check.mjs` (sin scroll lateral de 320 px a PC), `print-check.mjs`, `screens.mjs`, `icons.mjs`, `tutorial/make-video.mjs`.
 
 ## Comandos
 

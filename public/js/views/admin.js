@@ -111,7 +111,7 @@ export function mount(el, { enter, logout }) {
     const q = normalize(search);
     const list = tenants.filter((t) => (filter === 'deleted' ? t.deleted : !t.deleted && (filter === 'all' || status(t).k === filter))
       && (!q || normalize(`${t.name} ${t.code} ${t.ownerEmail} ${t.ownerName} ${t.ownerPhone}`).includes(q)));
-    $('#a-list').innerHTML = list.length ? `<div class="table-wrap"><table class="table"><thead><tr><th>Sede</th><th class="hide-sm">Plan</th><th class="c">Estado</th><th class="r">Hoy</th><th class="hide-sm">Dueño</th><th class="r">Acciones</th></tr></thead><tbody>
+    $('#a-list').innerHTML = list.length ? `<div class="table-wrap"><table class="table table-cards"><thead><tr><th>Sede</th><th class="hide-sm">Plan</th><th class="c">Estado</th><th class="r">Hoy</th><th class="hide-sm">Dueño</th><th class="r">Acciones</th></tr></thead><tbody>
       ${list.map((t) => {
         const st = stats[t.id]; const s = status(t);
         return `<tr style="${t.deleted ? 'opacity:.55' : ''}">

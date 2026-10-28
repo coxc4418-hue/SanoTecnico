@@ -22,6 +22,7 @@ export function mount(el) {
   }
 
   function render() {
+    if (!$('#k-body')) return; // la vista ya se cerró (terminó de cargar tras navegar a otra)
     const sh = store.openShift;
     if (!sh) {
       $('#k-sub').textContent = 'La caja está cerrada.';

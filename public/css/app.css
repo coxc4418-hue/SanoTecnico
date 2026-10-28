@@ -903,3 +903,56 @@ td.click { cursor: pointer; }
 .budget td input[data-name] { max-width: none; }
 .budget td .badge { flex: none; }
 .rlist { display: flex; flex-direction: column; gap: 8px; }
+
+/* ---------- Sin scroll lateral en ningún dispositivo ----------
+   Las columnas de grid/flex toman el ancho mínimo de su contenido (textos largos sin salto),
+   lo que en teléfonos ensanchaba toda la página. Se fuerza que encojan y que los textos se ajusten. */
+html { overflow-x: hidden; }
+body, .app, .main, .content, .auth-screen { max-width: 100%; overflow-x: clip; }
+.grid-main > *, .grid-2 > *, .grid-3 > *, .kpis > *, .quick > *, .form-grid > *, .form-grid-3 > *,
+.tech-grid > *, .pipeline > *, .type-grid > *, .stack > *, .view-header > *, .toolbar > *, .card { min-width: 0; }
+.quick button > span:last-child { min-width: 0; overflow-wrap: anywhere; }
+.tech-grid { grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr)); }
+.seg { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.seg::-webkit-scrollbar { display: none; }
+.seg button { flex: none; }
+.btn { max-width: 100%; }
+.chips-wrap .chip { max-width: 100%; }
+.view-actions > .row, .toolbar > .row { flex-wrap: wrap; min-width: 0; }
+input[type="date"].input { min-width: 0; }
+@media (max-width: 980px) {
+  .auth-screen, .grid-main, .grid-2, .grid-3 { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .auth-panel { padding: 28px 16px; min-width: 0; }
+  .view-header > div:first-child { flex: 1 1 100%; }
+  .view-actions { width: 100%; }
+  .view-actions > .row, .toolbar > .row { flex: 1 1 100%; }
+  .view-actions > .row input[type="date"], .toolbar > .row input[type="date"] { flex: 1 1 0; width: auto; }
+  .toolbar .select { min-width: 0 !important; flex: 1 1 140px; }
+  .chips-wrap .chip { white-space: normal; height: auto; min-height: 34px; padding: 6px 13px; text-align: left; line-height: 1.25; }
+  .row-wrap > .btn { white-space: normal; height: auto; min-height: 32px; padding-top: 6px; padding-bottom: 6px; line-height: 1.2; text-align: left; }
+  .type-btn { min-width: 0; font-size: 11.5px; padding: 10px 2px; }
+  .type-btn span { max-width: 100%; overflow-wrap: anywhere; text-align: center; line-height: 1.15; }
+}
+@media (max-width: 400px) {
+  .type-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .kpis { gap: 8px; }
+  .kpi { padding: 11px; } .kpi-value { font-size: 19px; }
+  .content { padding: 16px 12px 28px; }
+}
+/* Ventanas emergentes: nunca más anchas que la pantalla */
+.modal-backdrop { grid-template-columns: minmax(0, 1fr); justify-items: center; }
+.modal, .modal-body, .modal-body > * { min-width: 0; }
+.modal-body { overflow-x: hidden; }
+/* Tablas que en teléfono se muestran como tarjetas (panel de sedes) */
+@media (max-width: 640px) {
+  .table-cards thead { display: none; }
+  .table-cards, .table-cards tbody { display: block; width: 100%; }
+  .table-cards tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 8px 12px; padding: 14px; border-bottom: 1px solid var(--border); }
+  .table-cards td { display: block; padding: 0 !important; border: 0 !important; text-align: left; min-width: 0; }
+  .table-cards td:first-child, .table-cards td:last-child { grid-column: 1 / -1; }
+  .table-cards td:last-child { display: flex; flex-wrap: wrap; gap: 6px; justify-content: flex-end; white-space: normal; }
+  .table-cards td.r { text-align: right; }
+  .table-cards td.c { text-align: left; justify-self: start; }
+}
