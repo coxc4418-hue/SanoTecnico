@@ -107,10 +107,10 @@ export function mount(el) {
     if (!data) return;
     const c = compute();
     printDoc(`Reporte del ${fmtDate(from)} al ${fmtDate(to)}`, `
-      <div class="kpis"><div class="kpi">Facturado<b>$${num(c.billed)}</b></div><div class="kpi">Ganancia bruta<b>$${num(c.profit)}</b></div><div class="kpi">Cobrado<b>$${num(c.cash)}</b></div><div class="kpi">Equipos recibidos<b>${data.received.length}</b></div><div class="kpi">Reparados<b>${c.repaired.length}</b></div></div>
+      <div class="kpis"><div class="kpi">Facturado<b>${usd(c.billed)}</b></div><div class="kpi">Ganancia bruta<b>${usd(c.profit)}</b></div><div class="kpi">Cobrado<b>${usd(c.cash)}</b></div><div class="kpi">Equipos recibidos<b>${data.received.length}</b></div><div class="kpi">Reparados<b>${c.repaired.length}</b></div></div>
       <h2>Fallas más comunes</h2><table><tbody>${top(c.faults).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="r">${v}</td></tr>`).join('')}</tbody></table>
-      <h2>Servicios</h2><table><tbody>${top(c.services).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="r">$${num(v)}</td></tr>`).join('')}</tbody></table>
-      <h2>Formas de pago</h2><table><tbody>${Object.entries(c.methods).filter(([, v]) => Math.abs(v) > 0.004).map(([k, v]) => `<tr><td>${esc(methodLabel(k))}</td><td class="r">$${num(v)}</td></tr>`).join('')}</tbody></table>`);
+      <h2>Servicios</h2><table><tbody>${top(c.services).map(([k, v]) => `<tr><td>${esc(k)}</td><td class="r">${usd(v)}</td></tr>`).join('')}</tbody></table>
+      <h2>Formas de pago</h2><table><tbody>${Object.entries(c.methods).filter(([, v]) => Math.abs(v) > 0.004).map(([k, v]) => `<tr><td>${esc(methodLabel(k))}</td><td class="r">${usd(v)}</td></tr>`).join('')}</tbody></table>`);
   };
   setRange('7');
   return null;

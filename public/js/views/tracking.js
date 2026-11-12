@@ -1,7 +1,7 @@
 // Sano-Técnico — Consulta pública del estado de un equipo (/estado/CODIGO)
 import { getTracking } from '../store.js';
 import { STATUS, DEVICE_TYPES } from '../store.js';
-import { esc, num, fmtDate, fmtDateTime, waLink } from '../utils.js';
+import { esc, num, fmtDate, fmtDateTime, waLink, usd } from '../utils.js';
 import { icon } from '../icons.js';
 
 const STEPS = ['recibido', 'diagnostico', 'reparacion', 'listo', 'entregado'];
@@ -59,8 +59,8 @@ export function mount(root) {
         ${t.deliveredAt ? `<div><span>Entregado</span><b>${fmtDate(t.deliveredAt)}</b></div>` : ''}
         <div><span>Falla reportada</span><b>${esc(t.fault || '—')}</b></div>
       </div>
-      ${t.items?.length ? `<div class="section-title mt-lg">Presupuesto</div><div class="tr-items">${t.items.map((i) => `<div class="between"><span>${esc(i.name)}</span><b>$${num(i.total)}</b></div>`).join('')}
-        <div class="between tr-total"><span>Total</span><b>$${num(t.total)}</b></div>${t.paid ? `<div class="between small"><span>Abonado</span><span>$${num(t.paid)}</span></div><div class="between"><span>Saldo</span><b>$${num(t.balance)}</b></div>` : ''}</div>` : ''}
+      ${t.items?.length ? `<div class="section-title mt-lg">Presupuesto</div><div class="tr-items">${t.items.map((i) => `<div class="between"><span>${esc(i.name)}</span><b>${usd(i.total)}</b></div>`).join('')}
+        <div class="between tr-total"><span>Total</span><b>${usd(t.total)}</b></div>${t.paid ? `<div class="between small"><span>Abonado</span><span>${usd(t.paid)}</span></div><div class="between"><span>Saldo</span><b>${usd(t.balance)}</b></div>` : ''}</div>` : ''}
       <div class="tr-biz">
         <div><b>${esc(t.business?.name || '')}</b>${t.business?.address ? `<div class="small muted">${esc(t.business.address)}</div>` : ''}${t.business?.phone ? `<div class="small muted">Tel: ${esc(t.business.phone)}</div>` : ''}</div>
         ${wa ? `<a class="btn btn-whatsapp" href="${wa}" target="_blank" rel="noopener">${icon('whatsapp')} Escribir al taller</a>` : ''}

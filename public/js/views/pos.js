@@ -28,11 +28,11 @@ export function mount(el) {
         <div class="cart-ctx"><button class="btn btn-secondary btn-sm" id="c-cust">${icon('user')} <span class="ellipsis" id="c-cust-l">Cliente de mostrador</span></button></div></div>
       <div class="cart-list" id="c-list"></div>
       <div class="cart-foot">
-        <div class="cart-grand"><span class="lbl">Total</span><div class="val"><b id="c-total">$ 0,00</b><span id="c-totalbs">Bs 0,00</span></div></div>
+        <div class="cart-grand"><span class="lbl">Total</span><div class="val"><b id="c-total">${usd(0)}</b><span id="c-totalbs">${bs(0)}</span></div></div>
         <button class="btn btn-success btn-xl btn-block" id="c-pay">${icon('check')} Cobrar</button>
       </div>
     </aside>
-    <button class="cart-fab" id="cart-fab"><span><span class="cnt" id="fab-n">0</span>Ver venta</span><b id="fab-t">$ 0,00</b></button>
+    <button class="cart-fab" id="cart-fab"><span><span class="cnt" id="fab-n">0</span>Ver venta</span><b id="fab-t">${usd(0)}</b></button>
   </div>`;
   const $ = (s) => el.querySelector(s);
   const sellable = () => store.products.filter((p) => p.active !== false && p.sellable !== false);

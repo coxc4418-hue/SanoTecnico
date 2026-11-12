@@ -1,6 +1,6 @@
 // Sano-Técnico — Componentes compartidos: tasa BCV, impresión, WhatsApp, QR y patrón de desbloqueo
 import { store, STATUS, DEVICE_TYPES, CHECKS, CHECK_STATES } from './store.js';
-import { openModal, toast, num, esc, parseNum, fmtDateTime, fmtDate, setBusy, usd, bs, methodLabel, qtyFmt, printHTML, todayKey, dayKey, waLink } from './utils.js';
+import { openModal, toast, num, esc, parseNum, fmtDateTime, fmtDate, setBusy, usd, bs, methodLabel, qtyFmt, printHTML, todayKey, dayKey, waLink, isVE } from './utils.js';
 import { icon } from './icons.js';
 import { deviceName, trackUrl, repairBalance } from './ops.js';
 
@@ -27,6 +27,7 @@ export async function fetchBcvRate() {
 }
 
 export async function autoUpdateRate() {
+  if (!isVE()) return false;
   const s = store.settings;
   if (s.rateAuto === false) return false;
   if (s.rateUpdatedAt && dayKey(new Date(s.rateUpdatedAt)) === todayKey() && store.rate > 0) return false;
@@ -34,12 +35,13 @@ export async function autoUpdateRate() {
     const r = await fetchBcvRate();
     if (Math.abs(r.rate - store.rate) < 0.0001 && s.rateUpdatedAt && dayKey(new Date(s.rateUpdatedAt)) === todayKey()) return false;
     await store.setRate(Math.round(r.rate * 100) / 100, true);
-    toast(`Tasa BCV del día actualizada: Bs ${num(r.rate)}`, 'info', 4000);
+    toast(`Tasa BCV del día actualizada: ${bs(r.rate)}`, 'info', 4000);
     return true;
   } catch (_) { return false; }
 }
 
 export function openRateModal() {
+  if (!isVE()) { import('./country.js').then((m) => m.openCountryPicker()); return; }
   const s = store.settings;
   const m = openModal({
     title: 'Tasa del día',
@@ -76,7 +78,7 @@ export function openRateModal() {
     if (!(v > 0)) { toast('Ingresa una tasa válida', 'warning'); input.focus(); return; }
     await store.saveSettings({ rateAuto: m.el.querySelector('[data-autoflag]').checked });
     await store.setRate(v, false);
-    toast(`Tasa actualizada: Bs ${num(v)} por $1`);
+    toast(`Tasa actualizada: ${bs(v)} por $1`);
     m.close();
   };
   m.el.querySelector('[data-f]').onsubmit = save;
@@ -179,19 +181,19 @@ export function customerMessage(r, kind = r.status) {
   const link = r.trackCode ? `\n\nSigue tu equipo aquí: ${trackUrl(r.trackCode)}` : '';
   const total = (r.total || 0) - (r.discount || 0);
   const bal = repairBalance(r);
-  const money = total > 0 ? `\nTotal: $${num(total)} (Bs ${num(total * store.rate)})${r.paid ? `\nAbonado: $${num(r.paid)}\nSaldo: $${num(bal)}` : ''}` : '';
+  const money = total > 0 ? `\nTotal: ${usd(total)}${bs(total * store.rate) ? ` (${bs(total * store.rate)})` : ''}${r.paid ? `\nAbonado: ${usd(r.paid)}\nSaldo: ${usd(bal)}` : ''}` : '';
   const h = `Hola ${name} 👋, te escribimos de *${biz}*.`;
   const T = {
     recibido: `${h}\n\nRecibimos tu *${dev}* con la orden *${r.number}*.\nFalla reportada: ${r.fault || '—'}${r.promisedAt ? `\nFecha estimada: ${fmtDate(r.promisedAt)}` : ''}${link}`,
     diagnostico: `${h}\n\nTu *${dev}* (orden ${r.number}) está en diagnóstico. Te avisaremos apenas tengamos el presupuesto.${link}`,
-    presupuesto: `${h}\n\nYa revisamos tu *${dev}* (orden ${r.number}).${r.diagnosis ? `\nDiagnóstico: ${r.diagnosis}` : ''}\n\nPresupuesto:\n${(r.items || []).map((i) => `• ${i.qty > 1 ? qtyFmt(i.qty) + ' × ' : ''}${i.name}: $${num(i.price * i.qty)}`).join('\n') || '—'}${money}\n\n¿Aprobamos la reparación? Responde *SÍ* para continuar.${link}`,
+    presupuesto: `${h}\n\nYa revisamos tu *${dev}* (orden ${r.number}).${r.diagnosis ? `\nDiagnóstico: ${r.diagnosis}` : ''}\n\nPresupuesto:\n${(r.items || []).map((i) => `• ${i.qty > 1 ? qtyFmt(i.qty) + ' × ' : ''}${i.name}: ${usd(i.price * i.qty)}`).join('\n') || '—'}${money}\n\n¿Aprobamos la reparación? Responde *SÍ* para continuar.${link}`,
     repuesto: `${h}\n\nEstamos esperando el repuesto para tu *${dev}* (orden ${r.number}). Te avisamos apenas llegue.${link}`,
     reparacion: `${h}\n\nTu *${dev}* (orden ${r.number}) ya está en reparación. 🔧${link}`,
     listo: `${h}\n\n✅ ¡Tu *${dev}* está listo para retirar! (orden ${r.number})${money}\n\nTe esperamos${store.settings.address ? ` en ${store.settings.address}` : ''}.${link}`,
     no_reparado: `${h}\n\nLamentablemente tu *${dev}* (orden ${r.number}) no pudo ser reparado.${r.diagnosis ? `\nMotivo: ${r.diagnosis}` : ''}\nPuedes pasar a retirarlo cuando gustes.${link}`,
     entregado: `${h}\n\n¡Gracias por tu confianza! Entregamos tu *${dev}* (orden ${r.number}).${r.warrantyUntil ? `\nGarantía hasta el ${fmtDate(r.warrantyUntil)}.` : ''}${link}`,
     cancelado: `${h}\n\nTu orden ${r.number} (${dev}) fue cancelada.`,
-    cobro: `${h}\n\nRecordatorio: tu *${dev}* (orden ${r.number}) tiene un saldo pendiente de $${num(bal)} (Bs ${num(bal * store.rate)}).${link}`
+    cobro: `${h}\n\nRecordatorio: tu *${dev}* (orden ${r.number}) tiene un saldo pendiente de ${usd(bal)}${bs(bal * store.rate) ? ` (${bs(bal * store.rate)})` : ''}.${link}`
   };
   return T[kind] || T.recibido;
 }
@@ -231,7 +233,7 @@ export function receiptHTML(sale) {
   const rate = sale.rate || store.rate;
   const ivaPct = Number(s.iva) || 0;
   const ivaBs = ivaPct > 0 && sale.kind !== 'abono' ? (sale.total - sale.total / (1 + ivaPct / 100)) * rate : 0;
-  const pays = (sale.payments || []).map((p) => `<tr><td colspan="2">${esc(methodLabel(p.method))}</td><td class="r">${p.currency === 'BS' ? 'Bs ' + num(p.amount) : '$' + num(p.amount)}</td></tr>`).join('');
+  const pays = (sale.payments || []).map((p) => `<tr><td colspan="2">${esc(methodLabel(p.method))}</td><td class="r">${p.currency === 'BS' ? bs(p.amount) : usd(p.amount)}</td></tr>`).join('');
   return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="color-scheme" content="light"><style>:root{color-scheme:light}html,body{background:#fff;color:#000}</style><title>${esc(sale.number)}</title><style>${ticketCSS(s.receiptFormat)}</style></head><body>
     ${headerHTML()}
     <div class="hr"></div>
@@ -245,19 +247,19 @@ export function receiptHTML(sale) {
     ${sale.imei ? `<div>IMEI/Serial: ${esc(sale.imei)}</div>` : ''}
     ${sale.status === 'voided' ? '<div class="c b">*** DOCUMENTO ANULADO ***</div>' : ''}
     <div class="hr"></div>
-    <table>${(sale.items || []).map((it) => `<tr><td colspan="2" style="padding-top:3px">${qtyFmt(it.qty)} x ${esc(it.name)}</td><td class="r">$${num(it.total ?? it.price * it.qty)}</td></tr>`).join('')}</table>
+    <table>${(sale.items || []).map((it) => `<tr><td colspan="2" style="padding-top:3px">${qtyFmt(it.qty)} x ${esc(it.name)}</td><td class="r">${usd(it.total ?? it.price * it.qty)}</td></tr>`).join('')}</table>
     <div class="hr"></div>
     <table>
-      ${sale.kind !== 'abono' ? `<tr><td colspan="2">Subtotal</td><td class="r">$${num(sale.subtotal)}</td></tr>` : ''}
-      ${sale.discount > 0 ? `<tr><td colspan="2">Descuento</td><td class="r">-$${num(sale.discount)}</td></tr>` : ''}
-      <tr class="big"><td colspan="2">TOTAL $</td><td class="r">$${num(sale.total)}</td></tr>
-      <tr class="big"><td colspan="2">TOTAL Bs</td><td class="r">${num(sale.total * rate)}</td></tr>
-      ${sale.prepaid > 0 ? `<tr><td colspan="2">Abonado antes</td><td class="r">-$${num(sale.prepaid)}</td></tr><tr class="b"><td colspan="2">Pagado hoy</td><td class="r">$${num(sale.due)}</td></tr>` : ''}
-      <tr><td colspan="3" class="sm">Tasa: Bs ${num(rate)} por $</td></tr>
-      ${ivaBs > 0.009 ? `<tr><td colspan="2">IVA ${num(ivaPct, 0)}% incluido</td><td class="r">Bs ${num(ivaBs)}</td></tr>` : ''}
+      ${sale.kind !== 'abono' ? `<tr><td colspan="2">Subtotal</td><td class="r">${usd(sale.subtotal)}</td></tr>` : ''}
+      ${sale.discount > 0 ? `<tr><td colspan="2">Descuento</td><td class="r">-${usd(sale.discount)}</td></tr>` : ''}
+      <tr class="big"><td colspan="2">TOTAL $</td><td class="r">${usd(sale.total)}</td></tr>
+      ${isVE() ? `<tr class="big"><td colspan="2">TOTAL Bs</td><td class="r">${num(sale.total * rate)}</td></tr>` : ''}
+      ${sale.prepaid > 0 ? `<tr><td colspan="2">Abonado antes</td><td class="r">-${usd(sale.prepaid)}</td></tr><tr class="b"><td colspan="2">Pagado hoy</td><td class="r">${usd(sale.due)}</td></tr>` : ''}
+      ${isVE() ? `<tr><td colspan="3" class="sm">Tasa: ${bs(rate)} por $</td></tr>` : ''}
+      ${ivaBs > 0.009 ? `<tr><td colspan="2">IVA ${num(ivaPct, 0)}% incluido</td><td class="r">${bs(ivaBs)}</td></tr>` : ''}
     </table>
     ${pays ? `<div class="hr"></div><table>${pays}</table>` : ''}
-    ${sale.changeUSD > 0.009 ? `<div>Vuelto: ${sale.changeCurrency === 'BS' ? 'Bs ' + num(sale.changeUSD * rate) : '$' + num(sale.changeUSD)}</div>` : ''}
+    ${sale.changeUSD > 0.009 ? `<div>Vuelto: ${sale.changeCurrency === 'BS' ? bs(sale.changeUSD * rate) : usd(sale.changeUSD)}</div>` : ''}
     ${sale.warrantyUntil ? `<div class="hr"></div><div class="b">Garantía: ${sale.warrantyDays} días, hasta el ${fmtDate(sale.warrantyUntil)}</div><div class="sm">Cubre la pieza y el trabajo realizado. No cubre golpes, humedad ni manipulación de terceros.</div>` : ''}
     ${sale.note ? `<div>Nota: ${esc(sale.note)}</div>` : ''}
     <div class="hr"></div>
@@ -297,7 +299,7 @@ export async function printRepairOrder(r, fmt = store.settings.orderFormat || 'c
       ${r.condition?.length ? `<div>Estado: ${esc(r.condition.join(', '))}</div>` : ''}
       ${r.accessories?.length ? `<div>Accesorios: ${esc(r.accessories.join(', '))}</div>` : ''}
       ${r.promisedAt ? `<div>Entrega estimada: ${fmtDate(r.promisedAt)}</div>` : ''}
-      ${total > 0 ? `<div class="hr"></div><div>Presupuesto: $${num(total)}</div>${r.paid ? `<div>Abonado: $${num(r.paid)} · Saldo: $${num(repairBalance(r))}</div>` : ''}` : ''}
+      ${total > 0 ? `<div class="hr"></div><div>Presupuesto: ${usd(total)}</div>${r.paid ? `<div>Abonado: ${usd(r.paid)} · Saldo: ${usd(repairBalance(r))}</div>` : ''}` : ''}
       <div class="hr"></div>
       ${qr ? `<div class="c"><img src="${qr}" style="width:130px;height:130px"><div class="sm">Consulta el estado de tu equipo<br>Código: <b>${esc(r.trackCode)}</b></div></div>` : ''}
       <div class="hr"></div>
@@ -346,10 +348,10 @@ export async function printRepairOrder(r, fmt = store.settings.orderFormat || 'c
     <div class="grid"><div><span>Estado:</span> ${esc((r.condition || []).join(', ') || '—')}${r.conditionNote ? ' · ' + esc(r.conditionNote) : ''}</div><div><span>Accesorios recibidos:</span> ${esc((r.accessories || []).join(', ') || 'Ninguno')}</div></div>
     ${checksTable(r)}
     ${(r.items || []).length ? `<h3>Presupuesto</h3><table class="items"><thead><tr><th>Descripción</th><th class="r">Cant.</th><th class="r">Precio</th><th class="r">Total</th></tr></thead><tbody>
-      ${r.items.map((i) => `<tr><td>${esc(i.name)}</td><td class="r">${qtyFmt(i.qty)}</td><td class="r">$${num(i.price)}</td><td class="r">$${num(i.price * i.qty)}</td></tr>`).join('')}
-      ${r.discount > 0 ? `<tr><td colspan="3" class="r">Descuento</td><td class="r">-$${num(r.discount)}</td></tr>` : ''}
-      <tr><td colspan="3" class="r"><b>TOTAL</b></td><td class="r"><b>$${num(total)}</b><div class="muted">Bs ${num(total * store.rate)}</div></td></tr>
-      ${r.paid ? `<tr><td colspan="3" class="r">Abonado</td><td class="r">$${num(r.paid)}</td></tr><tr><td colspan="3" class="r"><b>Saldo</b></td><td class="r"><b>$${num(repairBalance(r))}</b></td></tr>` : ''}
+      ${r.items.map((i) => `<tr><td>${esc(i.name)}</td><td class="r">${qtyFmt(i.qty)}</td><td class="r">${usd(i.price)}</td><td class="r">${usd(i.price * i.qty)}</td></tr>`).join('')}
+      ${r.discount > 0 ? `<tr><td colspan="3" class="r">Descuento</td><td class="r">-${usd(r.discount)}</td></tr>` : ''}
+      <tr><td colspan="3" class="r"><b>TOTAL</b></td><td class="r"><b>${usd(total)}</b><div class="muted">${bs(total * store.rate)}</div></td></tr>
+      ${r.paid ? `<tr><td colspan="3" class="r">Abonado</td><td class="r">${usd(r.paid)}</td></tr><tr><td colspan="3" class="r"><b>Saldo</b></td><td class="r"><b>${usd(repairBalance(r))}</b></td></tr>` : ''}
     </tbody></table>` : ''}
     ${r.warrantyDays ? `<div style="margin-top:8px"><b>Garantía:</b> ${r.warrantyDays} días a partir de la entrega.</div>` : ''}
     <div class="terms"><b>Términos y condiciones:</b> ${esc(s.terms || '')}</div>

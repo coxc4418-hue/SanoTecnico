@@ -1,7 +1,7 @@
 // Sano-Técnico — Operaciones: órdenes de servicio, presupuestos, abonos, entregas, ventas, caja e inventario
 import { auth } from './firebase.js';
 import { store, STATUS, DEVICE_TYPES, isOpenStatus } from './store.js';
-import { round2, round4, nowISO, todayKey, PAY_METHODS, shortId, addDays } from './utils.js';
+import { round2, round4, nowISO, todayKey, PAY_METHODS, shortId, addDays, isVE, usd } from './utils.js';
 
 export const APP_URL = 'https://sano-tecnico.web.app';
 const by = () => (auth.currentUser?.isAnonymous ? 'demo' : (auth.currentUser?.email || '').split('@')[0] || '—');
@@ -69,13 +69,14 @@ function shiftIncrements(flow, extra = {}) {
 
 /** Valida los pagos contra el monto a cobrar y prepara el registro de caja */
 function preparePayment({ amount, payments, changeCurrency = 'BS' }) {
+  if (!isVE()) changeCurrency = 'USD';
   const rate = store.rate;
   if (!(rate > 0)) throw new Error('Configura la tasa del día antes de cobrar.');
   const shift = store.openShift;
   if (!shift) throw new Error('Abre la caja antes de cobrar (menú Caja).');
   const pays = normalizePays(payments, rate);
   const paidUSD = round4(pays.reduce((a, p) => a + p.usd, 0));
-  if (paidUSD < amount - 0.01) throw new Error(`Falta por cobrar $${round2(amount - paidUSD).toFixed(2)}.`);
+  if (paidUSD < amount - 0.01) throw new Error(`Falta por cobrar ${usd(amount - paidUSD)}.`);
   const changeUSD = round2(Math.max(0, paidUSD - amount));
   const flow = cashFlowOf(pays, changeUSD, changeCurrency, rate);
   return { rate, shift, pays, paidUSD, changeUSD, changeCurrency, flow, received: round2(paidUSD - changeUSD) };
@@ -201,7 +202,7 @@ export async function createRepair(data, deposit = null) {
     const pay = preparePayment(deposit);
     receipt = depositSale(b, { id: ref.id, ...r }, pay, deposit.amount);
     r.paid = round2(deposit.amount);
-    r.history.push({ at: date, status, note: `Abono de $${round2(deposit.amount).toFixed(2)} (${receipt.number})`, by: by() });
+    r.history.push({ at: date, status, note: `Abono de ${usd(deposit.amount)} (${receipt.number})`, by: by() });
   }
   b.set(ref, r);
   syncTracking(b, r);
@@ -239,7 +240,7 @@ export async function saveRepairItems(repair, items, { discount = repair.discoun
   const date = nowISO();
   const low = applyPartsDelta(b, repair.items, clean, `Orden ${repair.number}`);
   const next = { ...repair, items: clean, total: itemsTotal(clean), cost: itemsCost(clean), discount: round2(discount), updatedAt: date };
-  next.history = [...(repair.history || []), { at: date, status: next.status, note: `${note}: $${round2(next.total - next.discount).toFixed(2)}`, by: by() }];
+  next.history = [...(repair.history || []), { at: date, status: next.status, note: `${note}: ${usd(next.total - next.discount)}`, by: by() }];
   const { id, ...data } = next;
   b.set(store.ref('repairs', repair.id), data);
   syncTracking(b, next);
@@ -274,7 +275,7 @@ export async function registerDeposit(repair, { amount, payments, changeCurrency
   const receipt = depositSale(b, repair, pay, amount);
   const date = nowISO();
   const next = { ...repair, paid: round2((repair.paid || 0) + amount), updatedAt: date };
-  next.history = [...(repair.history || []), { at: date, status: repair.status, note: `Abono de $${amount.toFixed(2)} (${receipt.number})`, by: by() }];
+  next.history = [...(repair.history || []), { at: date, status: repair.status, note: `Abono de ${usd(amount)} (${receipt.number})`, by: by() }];
   const { id, ...data } = next;
   b.set(store.ref('repairs', repair.id), data);
   syncTracking(b, next);
@@ -335,7 +336,7 @@ export async function cancelRepair(repair, { reason = '', refund = false, refund
     b.update(store.ref('cash_shifts', shift.id), shiftIncrements(flow, { expensesUSD: repair.paid }));
     next.refunded = round2(repair.paid); next.paid = 0;
   }
-  next.history = [...(repair.history || []), { at: date, status: 'cancelado', note: `Orden cancelada${reason ? ': ' + reason : ''}${next.refunded ? ` · se devolvieron $${next.refunded.toFixed(2)}` : ''}`, by: by() }];
+  next.history = [...(repair.history || []), { at: date, status: 'cancelado', note: `Orden cancelada${reason ? ': ' + reason : ''}${next.refunded ? ` · se devolvieron ${usd(next.refunded)}` : ''}`, by: by() }];
   const { id, ...data } = next;
   b.set(store.ref('repairs', repair.id), data);
   syncTracking(b, next);

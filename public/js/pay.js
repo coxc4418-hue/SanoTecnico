@@ -1,6 +1,6 @@
 // Sano-Técnico — Ventana de cobro reutilizable (pagos mixtos en $ y Bs, abonos y vuelto)
 import { store } from './store.js';
-import { openModal, toast, num, esc, parseNum, setBusy, usd, bs, PAY_METHODS, round2 } from './utils.js';
+import { openModal, toast, num, esc, parseNum, setBusy, usd, bs, PAY_METHODS, round2, loc, isVE } from './utils.js';
 import { icon } from './icons.js';
 
 const prefPrint = () => { try { return localStorage.getItem('st_print') !== '0'; } catch (_) { return true; } };
@@ -17,18 +17,18 @@ export function openPay(opts) {
     const rate = store.rate;
     if (!(rate > 0)) { toast('Configura la tasa del día antes de cobrar.', 'warning'); resolve(null); return; }
     if (!store.openShift) { toast('Abre la caja antes de cobrar (menú Caja).', 'warning', 4500); resolve(null); return; }
-    const st = { amount: round2(opts.amount || 0), discount: round2(opts.discountValue || 0), pays: [], changeCurrency: 'BS' };
+    const st = { amount: round2(opts.amount || 0), discount: round2(opts.discountValue || 0), pays: [], changeCurrency: isVE() ? 'BS' : 'USD' };
     const base = round2(opts.baseTotal ?? opts.amount ?? 0);
     let done = false;
     const m = openModal({
       title: opts.title || 'Cobrar', size: 'lg',
-      sub: `${opts.sub ? opts.sub + ' · ' : ''}Tasa Bs ${num(rate)}`,
+      sub: `${opts.sub || ''}${isVE() ? (opts.sub ? ' · ' : '') + 'Tasa ' + bs(rate) : ''}`,
       body: `
         <div class="stack">
-          <div class="pay-total"><div class="small muted">${opts.editable ? 'Monto a abonar' : 'Total a cobrar'}</div><b data-total>$ 0,00</b><span data-totalbs>Bs 0,00</span></div>
+          <div class="pay-total"><div class="small muted">${opts.editable ? 'Monto a abonar' : 'Total a cobrar'}</div><b data-total>${usd(0)}</b><span data-totalbs>${bs(0)}</span></div>
           ${opts.editable || opts.discount ? `<div class="form-grid">
-            ${opts.editable ? `<div class="field"><label>Monto del abono ($)</label><div class="input-group"><span class="prefix">$</span><input class="input" data-amount inputmode="decimal" value="${num(st.amount)}"></div>${opts.max ? `<span class="hint">Saldo pendiente: ${usd(opts.max)}</span>` : ''}</div>` : ''}
-            ${opts.discount ? `<div class="field"><label>Descuento ($)</label><div class="input-group"><span class="prefix">$</span><input class="input" data-disc inputmode="decimal" value="${st.discount ? num(st.discount) : ''}" placeholder="0,00"></div></div>` : ''}
+            ${opts.editable ? `<div class="field"><label>Monto del abono ($)</label><div class="input-group"><span class="prefix">${esc(loc().sym)}</span><input class="input" data-amount inputmode="decimal" value="${num(st.amount)}"></div>${opts.max ? `<span class="hint">Saldo pendiente: ${usd(opts.max)}</span>` : ''}</div>` : ''}
+            ${opts.discount ? `<div class="field"><label>Descuento ($)</label><div class="input-group"><span class="prefix">${esc(loc().sym)}</span><input class="input" data-disc inputmode="decimal" value="${st.discount ? num(st.discount) : ''}" placeholder="0,00"></div></div>` : ''}
           </div>` : ''}
           <div data-breakdown class="small muted"></div>
           <div>
@@ -37,7 +37,7 @@ export function openPay(opts) {
           </div>
           <div class="pay-lines" data-lines></div>
           <div class="pay-status due" data-status></div>
-          <div class="between row-wrap" data-change-row hidden>
+          <div class="between row-wrap bs-only" data-change-row hidden>
             <span class="bold">Dar vuelto en</span>
             <div class="seg"><button type="button" data-cc="BS">Bolívares</button><button type="button" data-cc="USD">Dólares</button></div>
           </div>
@@ -65,7 +65,7 @@ export function openPay(opts) {
         const def = PAY_METHODS[p.method];
         return `<div class="pay-line">
           <span class="lbl"><i style="background:${def.color}"></i>${def.label}</span>
-          <div class="input-group"><span class="prefix">${def.cur === 'BS' ? 'Bs' : '$'}</span><input class="input input-sm" style="padding-left:${def.cur === 'BS' ? 34 : 26}px" data-amt="${i}" inputmode="decimal" value="${num(p.amount)}"></div>
+          <div class="input-group"><span class="prefix">${def.cur === 'BS' ? 'Bs' : loc().sym}</span><input class="input input-sm" style="padding-left:${def.cur === 'BS' ? 34 : 26}px" data-amt="${i}" inputmode="decimal" value="${num(p.amount)}"></div>
           <span class="small muted hide-xs num" data-eq="${i}">≈ ${def.cur === 'BS' ? usd(p.amount / rate) : bs(p.amount * rate)}</span>
           <button type="button" class="btn btn-ghost btn-icon btn-sm" data-rm="${i}" aria-label="Quitar">${icon('x')}</button>
         </div>`;
@@ -93,7 +93,7 @@ export function openPay(opts) {
       const stEl = $('[data-status]');
       if (t <= 0.004) { stEl.className = 'pay-status ok'; stEl.innerHTML = `<span>${icon('check')} Nada por cobrar</span><span></span>`; }
       else if (!st.pays.length) { stEl.className = 'pay-status due'; stEl.innerHTML = `<span>Elige una forma de pago</span><span>${usd(t)}</span>`; }
-      else if (diff < -0.009) { stEl.className = 'pay-status due'; stEl.innerHTML = `<span>Falta</span><span class="num">${usd(-diff)} · ${bs(-diff * rate)}</span>`; }
+      else if (diff < -0.009) { stEl.className = 'pay-status due'; stEl.innerHTML = `<span>Falta</span><span class="num">${usd(-diff)}${isVE() ? ' · ' + bs(-diff * rate) : ''}</span>`; }
       else { stEl.className = 'pay-status ok'; stEl.innerHTML = diff > 0.009 ? `<span>Vuelto</span><span class="num">${st.changeCurrency === 'BS' ? bs(diff * rate) : usd(diff)}</span>` : `<span>${icon('check')} Pago completo</span><span></span>`; }
       $('[data-change-row]').hidden = !(diff > 0.009);
       m.el.querySelectorAll('[data-cc]').forEach((b) => b.classList.toggle('on', b.dataset.cc === st.changeCurrency));

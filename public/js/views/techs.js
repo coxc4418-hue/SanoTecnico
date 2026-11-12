@@ -86,7 +86,7 @@ export function mount(el) {
   $('#t-new').onclick = () => edit();
   $('#t-from').onchange = (e) => { from = e.target.value; load(); };
   $('#t-to').onchange = (e) => { to = e.target.value; load(); };
-  $('#t-print').onclick = () => printDoc(`Técnicos · ${from} al ${to}`, `<table><thead><tr><th>Técnico</th><th class="r">En proceso</th><th class="r">Reparados</th><th class="r">Facturado</th><th class="r">Mano de obra</th><th class="r">Comisión %</th><th class="r">Comisión</th></tr></thead><tbody>${stats().map((s) => `<tr><td>${esc(s.t.name)}</td><td class="r">${s.open.length}</td><td class="r">${s.repaired.length}</td><td class="r">$${num(s.billed)}</td><td class="r">$${num(s.labor)}</td><td class="r">${num(s.t.commission || 0, 0)}%</td><td class="r"><b>$${num(s.commission)}</b></td></tr>`).join('')}</tbody></table>`);
+  $('#t-print').onclick = () => printDoc(`Técnicos · ${from} al ${to}`, `<table><thead><tr><th>Técnico</th><th class="r">En proceso</th><th class="r">Reparados</th><th class="r">Facturado</th><th class="r">Mano de obra</th><th class="r">Comisión %</th><th class="r">Comisión</th></tr></thead><tbody>${stats().map((s) => `<tr><td>${esc(s.t.name)}</td><td class="r">${s.open.length}</td><td class="r">${s.repaired.length}</td><td class="r">${usd(s.billed)}</td><td class="r">${usd(s.labor)}</td><td class="r">${num(s.t.commission || 0, 0)}%</td><td class="r"><b>${usd(s.commission)}</b></td></tr>`).join('')}</tbody></table>`);
   load();
   return store.on('*', (e) => { if (e === 'repairs' || e === 'settings') render(); });
 }

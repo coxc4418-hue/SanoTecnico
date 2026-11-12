@@ -2,7 +2,7 @@
 import { store } from '../store.js';
 import { moveProduct } from '../ops.js';
 import { requirePin } from '../auth.js';
-import { esc, usd, bs, num, toast, openModal, emptyState, parseNum, setBusy, normalize, debounce, qtyFmt, fmtDateTime, toCSV, download, parseCSV, nowISO, confirmDialog, startOfDay, endOfDay, addDays, dayKey, fromKey, round2, waLink } from '../utils.js';
+import { esc, usd, bs, num, toast, openModal, emptyState, parseNum, setBusy, normalize, debounce, qtyFmt, fmtDateTime, toCSV, download, parseCSV, nowISO, confirmDialog, startOfDay, endOfDay, addDays, dayKey, fromKey, round2, waLink, isVE } from '../utils.js';
 import { icon } from '../icons.js';
 import { printDoc } from '../shared.js';
 
@@ -123,7 +123,7 @@ export function mount(el, { params = {} }) {
       footer: `${isNew ? '' : `<button class="btn btn-danger-soft" data-del style="margin-right:auto">${icon('trash')} ${p.active === false ? 'Eliminar' : 'Desactivar'}</button>`}<button class="btn btn-secondary" data-close>Cancelar</button><button class="btn btn-primary" data-ok>${icon('check')} Guardar</button>`
     });
     const F = m.el.querySelector('[data-f]').elements;
-    const mg = () => { const c = parseNum(F.cost.value), pr = parseNum(F.price.value); m.el.querySelector('[data-mg]').textContent = pr > 0 ? `Ganancia ${usd(pr - c)} (${num(((pr - c) / pr) * 100, 0)}%) · ${bs(pr * store.rate)}` : ''; };
+    const mg = () => { const c = parseNum(F.cost.value), pr = parseNum(F.price.value); m.el.querySelector('[data-mg]').textContent = pr > 0 ? `Ganancia ${usd(pr - c)} (${num(((pr - c) / pr) * 100, 0)}%)${isVE() ? ' · ' + bs(pr * store.rate) : ''}` : ''; };
     F.cost.oninput = mg; F.price.oninput = mg; mg();
     const save = async (e) => {
       e?.preventDefault();
@@ -156,7 +156,7 @@ export function mount(el, { params = {} }) {
         <div class="field"><label data-ql>Cantidad</label><input class="input input-lg" data-q inputmode="decimal" placeholder="0" autofocus></div>
         <div class="field" data-costf><label>Costo por unidad ($)</label><input class="input" data-c inputmode="decimal" value="${num(p.lastCost || p.cost || 0)}"></div>
         <label class="check" data-payf><input type="checkbox" data-pay> <span>Pagar con dinero de la caja</span></label>
-        <div class="seg seg-block" data-curf hidden><button type="button" class="on" data-cur="USD">Dólares</button><button type="button" data-cur="BS">Bolívares</button></div>
+        <div class="seg seg-block bs-only" data-curf hidden><button type="button" class="on" data-cur="USD">Dólares</button><button type="button" data-cur="BS">Bolívares</button></div>
         <div class="field"><label>Nota</label><input class="input" data-r placeholder="Ej.: proveedor, factura, motivo de la merma"></div>
         <div class="hint" data-h></div><div class="error-msg" data-err></div></div>`,
       footer: `<button class="btn btn-secondary" data-close>Cancelar</button><button class="btn btn-primary" data-ok>${icon('check')} Registrar</button>`

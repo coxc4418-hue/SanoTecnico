@@ -2,7 +2,7 @@
 import { store } from '../store.js';
 import { voidSale } from '../ops.js';
 import { requirePin } from '../auth.js';
-import { esc, usd, bs, toast, openModal, emptyState, normalize, debounce, fmtDateTime, startOfDay, endOfDay, addDays, dayKey, fromKey, methodLabel, toCSV, download, setBusy, num } from '../utils.js';
+import { esc, usd, bs, toast, openModal, emptyState, normalize, debounce, fmtDateTime, startOfDay, endOfDay, addDays, dayKey, fromKey, methodLabel, toCSV, download, setBusy, num, isVE } from '../utils.js';
 import { icon } from '../icons.js';
 import { printReceipt } from '../shared.js';
 
@@ -36,7 +36,7 @@ export function mount(el) {
     const profit = valid.filter((s) => s.kind !== 'abono').reduce((a, s) => a + s.total - (s.cost || 0), 0);
     $('#f-kpis').innerHTML = `
       <div class="card kpi"><div class="kpi-top"><span class="kpi-label">Facturado</span><span class="kpi-icon tone-brand">${icon('file')}</span></div><div class="kpi-value">${usd(billed)}</div><div class="kpi-sub">${valid.filter((s) => s.kind !== 'abono').length} documento(s)</div></div>
-      <div class="card kpi"><div class="kpi-top"><span class="kpi-label">Cobrado</span><span class="kpi-icon tone-success">${icon('dollar')}</span></div><div class="kpi-value">${usd(received)}</div><div class="kpi-sub">incluye abonos · ${bs(received * store.rate)}</div></div>
+      <div class="card kpi"><div class="kpi-top"><span class="kpi-label">Cobrado</span><span class="kpi-icon tone-success">${icon('dollar')}</span></div><div class="kpi-value">${usd(received)}</div><div class="kpi-sub">incluye abonos${isVE() ? ' · ' + bs(received * store.rate) : ''}</div></div>
       <div class="card kpi"><div class="kpi-top"><span class="kpi-label">Ganancia bruta</span><span class="kpi-icon tone-violet">${icon('trend')}</span></div><div class="kpi-value">${usd(profit)}</div><div class="kpi-sub">facturado menos costo de repuestos</div></div>
       <div class="card kpi"><div class="kpi-top"><span class="kpi-label">Anulados</span><span class="kpi-icon tone-danger">${icon('x')}</span></div><div class="kpi-value">${rows.length - valid.length}</div><div class="kpi-sub">en el período</div></div>`;
     const counts = { all: rows.length }; Object.keys(KIND).forEach((k) => { counts[k] = rows.filter((s) => s.kind === k).length; });

@@ -1,10 +1,10 @@
 // Sano-Técnico — Service Worker (PWA, funcionamiento sin conexión)
-const VERSION = 'sanotecnico-v1.0.3';
+const VERSION = 'sanotecnico-v1.1.4';
 const SDK = 'https://www.gstatic.com/firebasejs/10.14.1/';
 const VIEWS = ['dashboard', 'intake', 'repairs', 'warranties', 'pos', 'invoices', 'cash', 'customers', 'inventory', 'techs', 'reports', 'settings', 'admin', 'search', 'tracking'];
 const SHELL = [
   '/', '/index.html', '/manifest.webmanifest', '/css/app.css',
-  '/js/main.js', '/js/firebase.js', '/js/store.js', '/js/auth.js', '/js/utils.js', '/js/icons.js', '/js/shared.js', '/js/ops.js', '/js/demo.js', '/js/repair.js', '/js/pay.js', '/js/install.js', '/js/tour.js', '/js/vendor/qrcode.js',
+  '/js/main.js', '/js/firebase.js', '/js/store.js', '/js/auth.js', '/js/utils.js', '/js/country.js', '/js/icons.js', '/js/shared.js', '/js/ops.js', '/js/demo.js', '/js/repair.js', '/js/pay.js', '/js/install.js', '/js/tour.js', '/js/vendor/qrcode.js',
   ...VIEWS.map((v) => `/js/views/${v}.js`),
   '/assets/logo.svg', '/assets/icon-192.png', '/assets/icon-512.png', '/assets/favicon.png', '/assets/apple-touch-icon.png',
   SDK + 'firebase-app.js', SDK + 'firebase-auth.js', SDK + 'firebase-firestore.js'
