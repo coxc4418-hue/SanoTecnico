@@ -247,18 +247,18 @@ export async function purgeTenant(tenantId, onlyDemo = true) {
   try {
     const reps = await getDocs(collection(db, 'tenants', tenantId, 'repairs'));
     const codes = reps.docs.map((d) => d.data().trackCode).filter(Boolean);
-    for (let i = 0; i < codes.length; i += 400) {
+    for (let i = 0; i < codes.length; i += 80) {
       const b = writeBatch(db);
-      codes.slice(i, i + 400).forEach((c) => b.delete(doc(db, 'tracking', c)));
+      codes.slice(i, i + 80).forEach((c) => b.delete(doc(db, 'tracking', c)));
       await b.commit().catch((e) => console.warn('[purge] seguimiento', e?.code || e));
     }
   } catch (e) { console.warn('[purge] seguimiento', e?.code || e); }
   for (const c of DATA_COLLECTIONS) {
     try {
       const snap = await getDocs(collection(db, 'tenants', tenantId, c));
-      for (let i = 0; i < snap.docs.length; i += 400) {
+      for (let i = 0; i < snap.docs.length; i += 80) {
         const b = writeBatch(db);
-        snap.docs.slice(i, i + 400).forEach((d) => b.delete(d.ref));
+        snap.docs.slice(i, i + 80).forEach((d) => b.delete(d.ref));
         await b.commit();
       }
     } catch (e) { console.warn('[purge]', c, e?.code || e); }

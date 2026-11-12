@@ -213,9 +213,9 @@ export function mount(el, { params = {} }) {
     };
     m.el.querySelector('[data-ok]').onclick = async (e) => {
       setBusy(e.currentTarget, true);
-      for (let i = 0; i < rows.length; i += 400) {
+      for (let i = 0; i < rows.length; i += 80) {
         const b = store.batch();
-        rows.slice(i, i + 400).forEach((r) => b.set(store.newRef('products'), { name: r[0], category: r[1] || 'Otros', compatible: r[2] || '', cost: round2(parseNum(r[3])), price: round2(parseNum(r[4])), stock: parseNum(r[5]), minStock: parseNum(r[6]), sku: r[7] || '', supplier: '', sellable: true, trackStock: true, active: true, sold: 0, createdAt: nowISO(), updatedAt: nowISO() }));
+        rows.slice(i, i + 80).forEach((r) => b.set(store.newRef('products'), { name: r[0], category: r[1] || 'Otros', compatible: r[2] || '', cost: round2(parseNum(r[3])), price: round2(parseNum(r[4])), stock: parseNum(r[5]), minStock: parseNum(r[6]), sku: r[7] || '', supplier: '', sellable: true, trackStock: true, active: true, sold: 0, createdAt: nowISO(), updatedAt: nowISO() }));
         await store.commit(b);
       }
       m.close(); toast(`${rows.length} producto(s) importados`);
